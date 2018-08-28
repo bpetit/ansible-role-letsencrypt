@@ -1,0 +1,13 @@
+---
+# defaults file for letsencrypt
+
+letsencrypt_domains: {}
+letsencrypt_files_owner: 'www-data'
+letsencrypt_files_group: 'www-data'
+letsencrypt_path: /etc/letsencrypt/live
+letsencrypt_webroot: /var/www
+letsencrypt_agreement: https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf
+letsencrypt_acme_directory: https://acme-v01.api.letsencrypt.org/directory
+letsencrypt_remaining_days: 365
+letsencrypt_intermediate_cert_url: https://letsencrypt.org/certs/letsencryptauthorityx3.pem.txt
+letsencrypt_root_ca_certificate: https://letsencrypt.org/certs/isrgrootx1.pem.txt

@@ -1,0 +1,38 @@
+---
+# tasks file for letsencrypt
+
+- name: ensure well-known directory exists
+  file:
+    path: "{{ letsencrypt_webroot }}/{{ item.name }}/.well-known/acme-challenge"
+    state: directory
+    recurse: yes
+    owner: "{{ letsencrypt_files_owner  }}"
+    group: "{{ letsencrypt_files_group }}"
+- letsencrypt:
+    account_key: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}_account.key"
+    csr: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.csr"
+    dest: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.crt"
+    agreement: "{{ letsencrypt_agreement }}"
+    account_email: "{{ letsencrypt_account_email }}"
+    remaining_days: "{{ item.remaining_days | default(letsencrypt_remaining_days) }}"
+    acme_directory: "{{ letsencrypt_acme_directory }}"
+  register: le_challenge
+  when: "item.renew is defined and item.renew"
+- debug:
+    var: le_challenge
+- copy:
+    dest: "{{ letsencrypt_webroot }}/{{ item.name }}/{{ le_challenge['challenge_data'][item.name]['http-01']['resource'] }}"
+    content: "{{ le_challenge['challenge_data'][item.name]['http-01']['resource_value'] }}"
+    owner: www-data
+    group: www-data
+  when: le_challenge|changed
+- letsencrypt:
+    account_key: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}_account.key"
+    csr: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.csr"
+    dest: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.crt"
+    data: "{{ le_challenge }} "
+    agreement: "{{ letsencrypt_agreement }}"
+    account_email: "{{ letsencrypt_account_email }}"
+    acme_directory: "{{ letsencrypt_acme_directory }}"
+  register: result
+  when: "item.renew is defined and item.renew and le_challenge|changed"

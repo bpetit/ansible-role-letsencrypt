@@ -1,0 +1,26 @@
+- name: get the intermediate certificate
+  get_url:
+    url: "{{ letsencrypt_intermediate_cert_url }}"
+    dest: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.intermediate.crt"
+- name: read the intermediate certificate file
+  shell: cat "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.intermediate.crt"
+  register: file_content
+- name: add intermediate certificate in the certificate file
+  blockinfile:
+    path: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.crt"
+    block: |
+      {{ file_content.stdout }}
+    marker: ""
+- name: get the root certificate
+  get_url:
+    url: "{{ letsencrypt_root_ca_certificate }}"
+    dest: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.root.crt"
+- name: read the root certificate file
+  shell: cat "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.root.crt"
+  register: file_content
+- name: add root certificate in the certificate file
+  blockinfile:
+    path: "{{ letsencrypt_path }}/{{ item.name }}/{{ item.name }}.crt"
+    block: |
+      {{ file_content.stdout }}
+    marker: ""
