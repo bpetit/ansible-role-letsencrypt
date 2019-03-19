@@ -1,6 +1,6 @@
 - name: validate certificate
   include_tasks: generate.yml
-  whith_items: "{{ letsencrypt_domains }}"
+  with_items: "{{ letsencrypt_domains }}"
 - name: insert intermediate and root certificate
   include_tasks: intermediate.yml
-  whith_items: "{{ letsencrypt_domains }}"
+  with_items: "{{ letsencrypt_domains }}"
